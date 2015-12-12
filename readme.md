@@ -2,7 +2,7 @@
 
 I found myself repeating the same stuff over and over again when creating React templates. This is an attempt at abstracting a bunch of the boilerplate.
 
-### What is a template?
+## What is a template?
 
 The way I work, React components can be separated in two types:
 - Functional
@@ -13,7 +13,7 @@ Yes, I know this is kind of a throwback to MVC (or at least VC), but there isn't
 - not write a lot of boilerplate to pass down presentational options from components to nested components. I want class names to be concatenated, styles to be merged, recursively and without writing anything.
 
 
-### How it works
+# How it works
 
 just use `template(renderFunction,defaultProps)`
 
@@ -140,8 +140,13 @@ const template = createTemplates();
 template(/**...use it as usual**/)
 ```
 
+# Install
 
-## TODO
+```sh
+npm install react-tmpl
+```
+
+# TODO
 
 - Better documentation
 - Tests
