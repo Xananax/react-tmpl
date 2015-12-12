@@ -47,5 +47,13 @@
     "templates",
     "react"
   ],
-  "author": "xananax@yelostudio.com"
+  "author": "xananax@yelostudio.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Xananax/react-tmpl.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Xananax/react-tmpl/issues"
+  },
+  "homepage": "https://github.com/Xananax/react-tmpl#readme"
 }
