@@ -1,14 +1,14 @@
 {
   "name": "react-tmpl",
   "description": "Abstract boilerplate from writing presentational React",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "main": "index.js",
   "license": "MIT",
   "scripts": {
     "clean": "rm -rf ./dist/*",
     "es5": "node ./node_modules/.bin/babel ./src -d ./dist",
     "compile": "npm run clean && npm run es5",
-    "commit":"npm run compile && git add -A -n && echo \"press a key to continue\" && read && git add -A && git commit",
+    "commit":"rm -rf npm-debug.log && npm run compile && git add -A -n && echo \"press a key to continue\" && read && vim package.json && git add -A && git commit",
     "push":"npm run commit && git push && npm publish",
     "start": "webpack-dev-server --hot --inline --config webpack/server.js"
   },
