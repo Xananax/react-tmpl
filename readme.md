@@ -77,7 +77,7 @@ tmpl(
 ```
 
 This component does several things:
-- `this.Button()` calls the `Button` template (or throws if `Button` was not defined)
+- `this.Button()` calls the `Button` template (or throws if `Button` was not defined). The function is binded to the instance and takes two arguments: optional `props`, and optional `key`. This allows to use the function directly in a map (`return props.array.map(this.Template)`)
 - it will merge the props given in the render function (`{type:'secondary'}`) with the default defined props (`{text:'×'}`)
 - it will merge *those* props with the `Button` template default props (`type` and `getTime`)
 - the final button will have the classes `button close`.
@@ -99,7 +99,22 @@ tmpl(
 )
 ```
 
-template offers a helper to get data from the current locals:
+If you want to include a template without passing options, it's enough to just do:
+```js
+{
+	/*...*/
+	Button:{}
+	/*...*/
+}
+```
+
+To switch a template:
+
+```js
+CloseButton.templates.Button = class MyButton extends React.Component{/*...*/}
+```
+
+react-tmpl offers a helper to get data from the current locals:
 `prop(predicate)`, where predicate can be either a string, or a function.
 Here's how you would use it:
 
@@ -137,7 +152,7 @@ One last thing to know is that you can namespace your templates:
 import {createTemplates} from 'react-tmpl'
 const template = createTemplates();
 
-template(/**...use it as usual**/)
+template(/*...use it as usual*/)
 ```
 
 # Install

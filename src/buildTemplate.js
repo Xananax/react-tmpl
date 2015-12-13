@@ -67,9 +67,10 @@ export default function buildTemplate(render,conf,templates){
 			return;
 		}
 		if(/^[A-Z]/.test(key)){
-			Template.prototype[key] = function(locals){
-				return this.autoTemplate(key,locals);
+			Template.prototype[key] = function(locals,arrKey){
+				return this.autoTemplate(key,locals,arrKey);
 			}
+			Template.bindables = Template.bindables ? [...Template.bindables,key] : [key];
 			Template.props.children[key] = val;
 			return;
 		}

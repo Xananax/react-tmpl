@@ -7,6 +7,7 @@ import computeProps from './computeProps';
 
 export const statics = {
 	cx:cx
+,	templates:{}
 ,	bind(obj){
 		const bindables = this.bindables;
 		if(bindables && bindables.length){
@@ -91,21 +92,27 @@ export const methods = {
 		return locals;
 	}
 ,	getTemplate(name){
-		const templates = this.getTemplates();
+		const templates = this.constructor.templates;
 		if(name in templates){return templates[name];}
+		const defTemplates = this.getTemplates();
+		if(name in defTemplates){return defTemplates[name];}
 		throw new Error(`could not find the \`${name}\`template`);
 	}
-,	fillTemplate(name,givenProps){
+,	fillTemplate(name,givenProps,key){
 		const template = this.getTemplate(name);
 		const defaultProps = template.props.self;
 		const props = mergeProps(defaultProps,givenProps);
+		const Temp = template;
+		if(typeof key!=='undefined'){
+			return React.createElement(template,{...props,key});
+		}
 		return React.createElement(template,props);
 	}
-,	autoTemplate(name,givenProps){
+,	autoTemplate(name,givenProps,key){
 		if(!givenProps && !this.locals[name]){return null;}
 		const props = givenProps ? assign(this.locals[name],givenProps) : this.locals[name];
 		if(this.props.includeCSS){props.includeCSS = true;}
-		return this.fillTemplate(name,props);
+		return this.fillTemplate(name,props,key);
 	}
 ,	render(){
 		const template = this.constructor.template;

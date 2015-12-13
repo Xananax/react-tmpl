@@ -64,11 +64,11 @@ template(
 		const Button = template.Button;
 		if(!buttons){return null;}
 		return (<section style={style}>
-			{buttons.map((button,key)=>
-				(button.text && button.action && <Button action={button.action} text={button.text} key={key}/>) ||
-				button
-			)}
+			{buttons.map(this.Button)}
 		</section>)
+	}
+,	{
+		Button:{}
 	}
 )
 

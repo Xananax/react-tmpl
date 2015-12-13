@@ -1,4 +1,8 @@
 {
+  "name": "react-tmpl",
+  "description": "Abstract boilerplate from writing presentational React",
+  "version": "0.1.1",
+  "main": "index.js",
   "license": "MIT",
   "scripts": {
     "clean": "rm -rf ./dist/*",
@@ -36,10 +40,6 @@
     "webpack": "^1.12.6",
     "webpack-dev-server": "1.12.1"
   },
-  "name": "react-tmpl",
-  "description": "Abstract boilerplate from writing presentational React",
-  "version": "0.1.0",
-  "main": "index.js",
   "directories": {
     "example": "example"
   },
