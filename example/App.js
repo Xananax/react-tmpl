@@ -1,7 +1,7 @@
 import React,{Component} from 'react';
 import templates from './templates'
 
-const {Modal,Link} = templates;
+const {Modal,KitchenSink} = templates;
 
 class App extends Component{
 
@@ -17,7 +17,7 @@ class App extends Component{
 				>
 					{this.state.open?'close':'open'}
 			</button>
-			<Link>sdfsdfsf</Link>
+			<KitchenSink>sdfsdfsf</KitchenSink>
 			<Modal
 				onClose={()=>this.setState({open:false})}
 				title="I am a modal box"

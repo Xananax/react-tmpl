@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import template,{prop} from '../src';
 
 template(
@@ -73,9 +74,9 @@ template(
 )
 
 template(
-	function Link(props){
+	function KitchenSink(props){
 		return(<span {...props}>
-			link
+			some text
 		</span>)
 	}
 ,	{
@@ -90,7 +91,7 @@ template(
 template(
 	function Modal(props){
 		const closeButton = this.CloseButton();
-		return (<div {...props} role="dialog" aria-labelledby={props.slug}>
+		return (<div {...props} role="dialog" aria-labelledby={props.slug} ref='node'>
 			{this.Header({additional:closeButton})}
 			{props.children}
 			{this.Contents()}
@@ -105,14 +106,9 @@ template(
 				'modal-open':prop('isOpen')
 			}
 		]
-	,	state:{
-			width:400
-		,	height:300
-		,	docWidth:0
-		,	docHeight:0
-		,	top:0
-		,	left:0
-		}
+	,	plugins:[
+			template.plugins.windowResize
+		]
 	,	calculateSize(){
 			const docHeight = window.innerHeight;
 			const docWidth = window.innerWidth;
@@ -140,10 +136,8 @@ template(
 		}
 	,	style:{
 			position:'absolute'
-		,	width:prop((locals,obj)=>obj.state.width)
-		,	height:prop((locals,obj)=>obj.state.height)
-		,	top:prop((locals,obj)=>obj.state.top)
-		,	left:prop((locals,obj)=>obj.state.left)
+		,	top:prop('top')
+		,	left:prop('left')
 		}
 	,	css:{
 			minWidth:300
@@ -152,6 +146,17 @@ template(
 		,	padding:'1em'
 		,	borderRadius:'2px'
 		,	boxShadow:'0 14px 45px rgba(0, 0, 0, 0.25), 0 10px 18px rgba(0, 0, 0, 0.22)'
+		}
+	,	processProps(locals){
+			if(this.refs.node){
+				const {vw,vh} = this.state;
+				const {clientWidth,clientHeight} = this.refs.node;
+				const top = (vh > clientHeight) ? ((vh - clientHeight) / 2) : 0;
+				const left = (vw > clientWidth) ? ((vw - clientWidth) / 2) : 0;
+				locals.props.top = top;
+				locals.props.left = left;
+			}
+			return locals;
 		}
 	,	buildLocals(locals){
 			locals.props.slug = this.slug(locals.props.title);

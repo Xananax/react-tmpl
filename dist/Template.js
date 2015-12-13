@@ -73,6 +73,21 @@ var methods = exports.methods = {
 	initialize: function initialize(props) {
 		this.constructor.bind(this);
 	},
+	replaceMethod: function replaceMethod(name, method) {
+		var _old = this[name];
+		if (_old) {
+			this[name] = function () {
+				for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+					args[_key] = arguments[_key];
+				}
+
+				_old.apply(this, args);
+				return method.apply(this, args);
+			};
+		} else {
+			this[name] = method;
+		}
+	},
 	compute: function compute(computedProps) {
 		return (0, _computeProps2.default)(this, computedProps);
 	},

@@ -19,7 +19,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
-var skip = /^(propTypes|name|className|style|css|state)$/;
+var skip = /^(propTypes|name|className|style|css|state|plugins)$/;
 var staticsKeys = Object.keys(_Template.statics);
 var methodsKeys = Object.keys(_Template.methods);
 
@@ -27,18 +27,27 @@ function buildTemplate(render, conf, templates) {
 
 	var name = conf && conf.name || render.name;
 	var state = (0, _jobj.assign)(conf && conf.state || {});
+	var plugins = conf && conf.plugins;
 	if (!name) {
 		throw new Error('`name` is a required property');
 	}
 
-	function Template(props, context) {
+	var Template = function Template(props, context) {
+		var _this = this;
+
 		if (!(this instanceof Template)) {
 			return new Template(props, context);
 		}
 		_react.Component.call(this, props, context);
-		this.state = state;
+		var _state = state;
+		if (plugins) {
+			plugins.forEach(function (plugin) {
+				_state = plugin.call(_this, props, _state);
+			});
+		}
+		this.state = _state;
 		this.initialize(props);
-	}
+	};
 
 	staticsKeys.forEach(function (key) {
 		Template[key] = _Template.statics[key];
@@ -49,6 +58,7 @@ function buildTemplate(render, conf, templates) {
 	Template.template = render;
 
 	var prototype = new _react.Component();
+
 	methodsKeys.forEach(function (key) {
 		prototype[key] = _Template.methods[key];
 	});
@@ -134,7 +144,7 @@ function buildTemplate(render, conf, templates) {
 
 	if (mixins) {
 		mixins.forEach(function (mixin) {
-			Template = mixin(Template);
+			templates[name] = mixin(Template);
 		});
 	}
 	return Template;

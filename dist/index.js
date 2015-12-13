@@ -6,6 +6,10 @@ Object.defineProperty(exports, "__esModule", {
 exports.prop = prop;
 exports.createTemplates = createTemplates;
 
+var _plugins = require('./plugins');
+
+var _plugins2 = _interopRequireDefault(_plugins);
+
 var _buildTemplate = require('./buildTemplate');
 
 var _buildTemplate2 = _interopRequireDefault(_buildTemplate);
@@ -34,6 +38,7 @@ function createTemplates() {
 		return _buildTemplate2.default.apply(undefined, [render, conf, boundBuildTemplate].concat(mixins));
 	}
 	boundBuildTemplate.prop = prop;
+	boundBuildTemplate.plugins = _plugins2.default;
 	return boundBuildTemplate;
 }
 

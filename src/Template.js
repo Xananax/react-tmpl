@@ -35,6 +35,17 @@ export const methods = {
 	initialize(props){
 		this.constructor.bind(this);
 	}
+,	replaceMethod(name,method){
+		const _old = this[name];
+		if(_old){		
+			this[name] = function(...args){
+				_old.apply(this,args);
+				return method.apply(this,args)
+			}
+		}else{
+			this[name] = method;
+		}
+	}
 ,	compute(computedProps){
 		return computeProps(this,computedProps);
 	}

@@ -2,7 +2,7 @@ import React,{PropTypes,Component} from 'react'
 import {arrayToObj,assign} from 'jobj';
 import {statics,methods} from './Template';
 
-const skip = /^(propTypes|name|className|style|css|state)$/
+const skip = /^(propTypes|name|className|style|css|state|plugins)$/
 const staticsKeys = Object.keys(statics);
 const methodsKeys = Object.keys(methods);
 
@@ -10,12 +10,19 @@ export default function buildTemplate(render,conf,templates,...mixins){
 
 	const name = (conf && conf.name) || render.name;
 	const state = assign((conf && conf.state) || {});
+	const plugins = conf && conf.plugins;
 	if(!name){throw new Error('`name` is a required property');}
 
-	function Template(props,context){
+	const Template = function Template(props,context){
 		if(!(this instanceof Template)){return new Template(props,context);}
 		Component.call(this,props,context);
-		this.state = state;
+		var _state = state;
+		if(plugins){
+			plugins.forEach(plugin=>{
+				_state = plugin.call(this,props,_state);
+			})
+		}
+		this.state = _state;
 		this.initialize(props);
 	}
 
@@ -28,6 +35,7 @@ export default function buildTemplate(render,conf,templates,...mixins){
 	Template.template = render;
 
 	const prototype = new Component();
+
 	methodsKeys.forEach(function(key){
 		prototype[key] = methods[key];
 	})
@@ -106,7 +114,7 @@ export default function buildTemplate(render,conf,templates,...mixins){
 	templates[name] = Template;
 	if(mixins){
 		mixins.forEach(mixin=>{
-			Template = mixin(Template)
+			templates[name] = mixin(Template)
 		});
 	}
 	return Template;

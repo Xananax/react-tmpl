@@ -1,3 +1,4 @@
+import plugins from './plugins'
 import buildTemplate from './buildTemplate';
 import Template from './Template';
 import GetProp from './GetProp';
@@ -12,6 +13,7 @@ export function createTemplates(){
 		return buildTemplate(render,conf,boundBuildTemplate,...mixins);
 	}
 	boundBuildTemplate.prop = prop;
+	boundBuildTemplate.plugins = plugins;
 	return boundBuildTemplate;
 }
 
