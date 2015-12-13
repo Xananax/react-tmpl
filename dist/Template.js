@@ -1,5 +1,7 @@
 'use strict';
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
@@ -29,6 +31,7 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 
 var statics = exports.statics = {
 	cx: _classnames2.default,
+	templates: {},
 	bind: function bind(obj) {
 		var bindables = this.bindables;
 		if (bindables && bindables.length) {
@@ -122,19 +125,27 @@ var methods = exports.methods = {
 		return locals;
 	},
 	getTemplate: function getTemplate(name) {
-		var templates = this.getTemplates();
+		var templates = this.constructor.templates;
 		if (name in templates) {
 			return templates[name];
 		}
+		var defTemplates = this.getTemplates();
+		if (name in defTemplates) {
+			return defTemplates[name];
+		}
 		throw new Error('could not find the `' + name + '`template');
 	},
-	fillTemplate: function fillTemplate(name, givenProps) {
+	fillTemplate: function fillTemplate(name, givenProps, key) {
 		var template = this.getTemplate(name);
 		var defaultProps = template.props.self;
 		var props = (0, _mergeProps2.default)(defaultProps, givenProps);
+		var Temp = template;
+		if (typeof key !== 'undefined') {
+			return _react2.default.createElement(template, _extends({}, props, { key: key }));
+		}
 		return _react2.default.createElement(template, props);
 	},
-	autoTemplate: function autoTemplate(name, givenProps) {
+	autoTemplate: function autoTemplate(name, givenProps, key) {
 		if (!givenProps && !this.locals[name]) {
 			return null;
 		}
@@ -142,7 +153,7 @@ var methods = exports.methods = {
 		if (this.props.includeCSS) {
 			props.includeCSS = true;
 		}
-		return this.fillTemplate(name, props);
+		return this.fillTemplate(name, props, key);
 	},
 	render: function render() {
 		var template = this.constructor.template;
