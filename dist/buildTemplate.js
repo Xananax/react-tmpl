@@ -134,7 +134,7 @@ function buildTemplate(render, conf, templates) {
 
 	if (mixins) {
 		mixins.forEach(function (mixin) {
-			return mixin(Template);
+			Template = mixin(Template);
 		});
 	}
 	return Template;

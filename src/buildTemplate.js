@@ -83,7 +83,7 @@ export default function buildTemplate(render,conf,templates,...mixins){
 		Template.props.self[key] = val;
 	})
 
-	if(Template.style){	
+	if(Template.style){
 		if(Template.style.hover){
 			const hover = Template.style.hover;
 			delete Template.style.hover;
@@ -105,7 +105,9 @@ export default function buildTemplate(render,conf,templates,...mixins){
 
 	templates[name] = Template;
 	if(mixins){
-		mixins.forEach(mixin=>mixin(Template));
+		mixins.forEach(mixin=>{
+			Template = mixin(Template)
+		});
 	}
 	return Template;
 }
