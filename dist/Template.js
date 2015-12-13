@@ -77,18 +77,35 @@ var methods = exports.methods = {
 		return (0, _computeProps2.default)(this, computedProps);
 	},
 	buildStyle: function buildStyle(givenProps, includeCSS) {
+		var Template = this.constructor;
 		var defCSS = includeCSS && this.constructor.css;
-		var defStyle = this.constructor.style;
+		var defStyle = Template.style;
 		var givenStyle = givenProps && givenProps.style;
 
 		if (!defCSS && !defStyle && !givenStyle) {
 			return;
 		}
 
-		return (0, _jobj.assign)(defCSS, defStyle, givenStyle);
+		var style = (0, _jobj.assign)(defCSS, defStyle, givenStyle);
+
+		var additional = [];
+
+		if (Template._hoverStyle && this.state.hover) {
+			additional.push(Template._hoverStyle);
+		}
+		if (Template._focusStyle && this.state.focus) {
+			additional.push(Template._focusStyle);
+		}
+		if (additional.length) {
+			var _Object;
+
+			return (_Object = Object).assign.apply(_Object, [style].concat(additional));
+		}
+		return style;
 	},
 	buildClassName: function buildClassName(givenProps) {
-		var def = this.constructor.className;
+		var Template = this.constructor;
+		var def = Template.className;
 		var given = givenProps.className;
 		if (def && def.length && given && given.length) {
 			var isArrayDef = Array.isArray(def);
@@ -110,18 +127,43 @@ var methods = exports.methods = {
 			return def;
 		}
 	},
-	buildLocals: function buildLocals(props) {
-		return props;
+	buildEventsHandlers: function buildEventsHandlers(givenProps) {
+		var bindables = this.constructor.bindables;
+		if (!bindables || !bindables.length) {
+			return;
+		}
+		var that = this;
+		var eventsHandlers = {};
+		bindables.forEach(function (name) {
+			eventsHandlers[name] = that[name];
+		});
+		return eventsHandlers;
+	},
+	processProps: function processProps(mergedProps) {
+		return mergedProps;
+	},
+	buildLocals: function buildLocals(generatedLocals) {
+		return generatedLocals;
+	},
+	computeClasses: function computeClasses(locals) {
+		if (locals.props.className) {
+			locals.props.className = Array.isArray(locals.props.className) ? _classnames2.default.apply(undefined, _toConsumableArray(locals.props.className)) : (0, _classnames2.default)(locals.props.className);
+		}
+		return locals;
+	},
+	mergeProps: function mergeProps(givenProps, eventsHandlers, className, style) {
+		var defaultProps = this.constructor.props;
+		return (0, _jobj.assign)({
+			props: (0, _jobj.assign)(defaultProps.self, givenProps, eventsHandlers, className && { className: className }, style && { style: style })
+		}, defaultProps.children);
 	},
 	getLocals: function getLocals(givenProps, includeCSS) {
 		var className = this.buildClassName(givenProps);
 		var style = this.buildStyle(givenProps, includeCSS);
-		var defaultProps = this.constructor.props;
-		var props = this.buildLocals((0, _jobj.assign)(defaultProps.self, defaultProps.children, givenProps, className && { className: className }, style && { style: style }));
-		var locals = this.compute(props, givenProps);
-		if (locals.className) {
-			locals.className = Array.isArray(locals.className) ? _classnames2.default.apply(undefined, _toConsumableArray(locals.className)) : (0, _classnames2.default)(locals.className);
-		}
+		var eventsHandlers = this.buildEventsHandlers(givenProps);
+		var mergedProps = this.mergeProps(givenProps, eventsHandlers, className, style);
+		var props = this.processProps(mergedProps);
+		var locals = this.buildLocals(this.computeClasses(this.compute(props, givenProps)));
 		return locals;
 	},
 	getTemplate: function getTemplate(name) {
@@ -139,7 +181,6 @@ var methods = exports.methods = {
 		var template = this.getTemplate(name);
 		var defaultProps = template.props.self;
 		var props = (0, _mergeProps2.default)(defaultProps, givenProps);
-		var Temp = template;
 		if (typeof key !== 'undefined') {
 			return _react2.default.createElement(template, _extends({}, props, { key: key }));
 		}
@@ -158,6 +199,6 @@ var methods = exports.methods = {
 	render: function render() {
 		var template = this.constructor.template;
 		this.locals = this.getLocals(this.props, this.props.includeCSS);
-		return template.call(this, this.locals);
+		return template.call(this, this.locals.props);
 	}
 };

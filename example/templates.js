@@ -73,6 +73,21 @@ template(
 )
 
 template(
+	function Link(props){
+		return(<span {...props}>
+			link
+		</span>)
+	}
+,	{
+		style:{
+			background:'blue'
+		,	hover:{background:'red'}
+		,	focus:{border:'dashed 1px red'}
+		}
+	}
+)
+
+template(
 	function Modal(props){
 		const closeButton = this.CloseButton();
 		return (<div {...props} role="dialog" aria-labelledby={props.slug}>
@@ -138,9 +153,9 @@ template(
 		,	borderRadius:'2px'
 		,	boxShadow:'0 14px 45px rgba(0, 0, 0, 0.25), 0 10px 18px rgba(0, 0, 0, 0.22)'
 		}
-	,	buildLocals(props){
-			props.slug = this.slug(props.title);
-			return props;
+	,	buildLocals(locals){
+			locals.props.slug = this.slug(locals.props.title);
+			return locals;
 		}
 	,	slug(title){
 			return title.replace(/[\s*&%$#]/g,'-');

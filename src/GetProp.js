@@ -5,7 +5,7 @@ class GetProp{
 		if(typeof fn !== 'function'){
 			const path = fn;
 			fn = function(locals){
-				return locals[path];
+				return locals.props[path];
 			}
 		}
 		this.fn = fn;

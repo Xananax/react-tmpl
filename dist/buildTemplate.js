@@ -15,6 +15,8 @@ var _Template = require('./Template');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
+
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 var skip = /^(propTypes|name|className|style|css|state)$/;
@@ -24,7 +26,7 @@ var methodsKeys = Object.keys(_Template.methods);
 function buildTemplate(render, conf, templates) {
 
 	var name = conf && conf.name || render.name;
-	var state = conf && conf.state || null;
+	var state = (0, _jobj.assign)(conf && conf.state || {});
 	if (!name) {
 		throw new Error('`name` is a required property');
 	}
@@ -75,6 +77,12 @@ function buildTemplate(render, conf, templates) {
 		Template.className = conf.className;
 	}
 
+	function addBindable(key) {
+		Template.bindables = Template.bindables ? [].concat(_toConsumableArray(Template.bindables), [key]) : [key];
+	}
+
+	Template.addBindable = addBindable;
+
 	conf && Object.keys(conf).forEach(function (key) {
 		var val = conf[key];
 		if (skip.test(key)) {
@@ -83,7 +91,7 @@ function buildTemplate(render, conf, templates) {
 		if (typeof val === 'function') {
 			Template.prototype[key] = val;
 			if (/^on/.test(key)) {
-				Template.bindables = Template.bindables ? [].concat(_toConsumableArray(Template.bindables), [key]) : [key];
+				addBindable(key);
 			}
 			return;
 		}
@@ -91,13 +99,54 @@ function buildTemplate(render, conf, templates) {
 			Template.prototype[key] = function (locals, arrKey) {
 				return this.autoTemplate(key, locals, arrKey);
 			};
-			Template.bindables = Template.bindables ? [].concat(_toConsumableArray(Template.bindables), [key]) : [key];
+			addBindable(key);
 			Template.props.children[key] = val;
 			return;
 		}
 		Template.props.self[key] = val;
 	});
 
+	if (Template.style) {
+		if (Template.style.hover) {
+			var hover = Template.style.hover;
+			delete Template.style.hover;
+			Template._hoverStyle = hover;
+			createEventHandler('onMouseEnter', { hover: true }, Template);
+			createEventHandler('onMouseLeave', { hover: false }, Template);
+		}
+		if (Template.style.focus) {
+			if (!Template.props.self.tabIndex) {
+				Template.props.self.tabIndex = 1;
+			}
+			var focus = Template.style.focus;
+			delete Template.style.focus;
+			Template._focusStyle = focus;
+			createEventHandler('onFocus', { focus: true }, Template);
+			createEventHandler('onBlur', { focus: false }, Template);
+		}
+	}
+
 	templates[name] = Template;
 	return Template;
+}
+
+function createEventHandler(name, state, Template) {
+	if (name in Template.prototype) {
+		var _ret = (function () {
+			var _original = Template.prototype[name];
+			Template.prototype[name] = function (evt) {
+				this.setState(state);
+				_original.call(this, evt);
+			};
+			return {
+				v: undefined
+			};
+		})();
+
+		if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+	}
+	Template.prototype[name] = function (evt) {
+		this.setState(state);
+	};
+	Template.addBindable(name);
 }

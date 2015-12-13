@@ -1,7 +1,7 @@
 import React,{Component} from 'react';
 import templates from './templates'
 
-const Modal = templates.Modal;
+const {Modal,Link} = templates;
 
 class App extends Component{
 
@@ -17,6 +17,7 @@ class App extends Component{
 				>
 					{this.state.open?'close':'open'}
 			</button>
+			<Link>sdfsdfsf</Link>
 			<Modal
 				onClose={()=>this.setState({open:false})}
 				title="I am a modal box"

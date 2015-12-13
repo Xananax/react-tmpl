@@ -18,7 +18,7 @@ var GetProp = (function () {
 			(function () {
 				var path = fn;
 				fn = function (locals) {
-					return locals[path];
+					return locals.props[path];
 				};
 			})();
 		}

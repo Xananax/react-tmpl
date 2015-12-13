@@ -49,6 +49,7 @@ Special keys:
 - `name` will be used as `displayName`, and will override the function name (if there was one). Note that `name` is required.
 - `buildLocals` is a function you can use to pre-process the locals.
 - `initialize` is a constructor function to set properties you need
+- `style.hover` and `style.focus` will automatically create `onMouseEnter`, `onMouseOut` (or `onFocus`, `onBlur`) and add keys (`state.hover` or `state.focus`). Note that `css.hover` and `css.focus` do *not* trigger this behavior (the assumption being, you do not want to handle those states in javascript if you have those in css).
 
 Additionally:
 
@@ -91,9 +92,11 @@ tmpl(
 	}
 ,	{
 		Button(givenProps){
-			const props = this.locals;
-			// `givenProps` is what is passed in the render function
-			// `locals` is the full object passed to the render function
+			const locals = this.locals;
+			const closeButtonProps = locals.props;
+			// `givenProps` is what is passed in the render function above ({type:'secondary'})
+			// `locals` is the full options object
+			// `locals.prop` is the object passed to the render function
 		}
 	}
 )
@@ -130,14 +133,14 @@ tmpl(
 			// here, `props` is what is natively passed to the component
 			this.id = ids++
 		}
-	,	buildLocals(props){
-			props.id = this.slug(props.text+this.id);
+	,	buildLocals(locals){
+			locals.props.id = this.slug(props.text+this.id);
 			return props;
 		}
 	,	slug(text){
 			return text.replace(/[\s*&%$#]/g,'-');
 		}
-	,	text:prop((locals)=>locals.mini?'×':'close')
+	,	text:prop((locals)=>locals.props.mini?'×':'close')
 	,	Button:{
 			text:prop('text')
 		,	id:prop('slug')
@@ -145,6 +148,8 @@ tmpl(
 	}
 )
 ```
+
+`prop('string')` is equivalent to `props(locals=>locals.props.string)`.
 
 One last thing to know is that you can namespace your templates:
 
@@ -160,6 +165,22 @@ template(/*...use it as usual*/)
 ```sh
 npm install react-tmpl
 ```
+
+# Structure of a React Template
+
+## How locals are built
+
+`this.locals` is rebuilt on every render. It contains, at the minimum, a property `this.locals.props` wich gets passed to the render function. It may also contain a number of keys for every nested template (e.g., `this.locals.Button`).
+
+The built process is as follows:
+- `this.locals.props.className` gets merged from default properties (passed at template creation) and passed props (from a parent template, or from the user)
+- `this.locals.props.style` gets merged from default properties and passed props
+- Any function that begins with an `onX` gets added to `this.locals` (so `onClick` and company are added to the bundle -- Bear in mind those functions have been scoped to the current instance already at this point). However, if passed props also contain a similarly named `onX` function, they will overwrite those (which are still accessible in the render function as `this.onX`)
+- `this.locals.props` will get merged with passed `props`, the latter keys overriding the former.
+- `this.locals` gets through a function `processProps`, that does nothing (useful for overriding stuff in your templates)
+- `this.locals` gets 'computed'. That is, every `prop` call gets resolved. At this point, `this.locals` is a fully serializable object.
+- `this.locals.props.className` gets through [classnames](https://github.com/JedWatson/classnames)
+- `this.locals` get through a function `buildLocals`, that does nothing. This is equivalent to `processProps`, the difference being, this is a fully resolved object.
 
 # TODO
 

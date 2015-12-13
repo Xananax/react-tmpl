@@ -1,7 +1,7 @@
 import React,{Component,Children} from 'react';
 import cx from 'classnames';
 
-import {assign,mapObj} from 'jobj';
+import {assign,mapObj,objFilter} from 'jobj';
 import mergeProps from './mergeProps';
 import computeProps from './computeProps';
 
@@ -39,16 +39,32 @@ export const methods = {
 		return computeProps(this,computedProps);
 	}
 ,	buildStyle(givenProps,includeCSS){
+		const Template = this.constructor
 		const defCSS = includeCSS && this.constructor.css;
-		const defStyle = this.constructor.style;
+		const defStyle = Template.style;
 		const givenStyle = givenProps && givenProps.style;
 
 		if(!defCSS && !defStyle && !givenStyle){return}
 
-		return assign(defCSS,defStyle,givenStyle);
+		const style = assign(defCSS,defStyle,givenStyle);
+
+		const additional = [];
+
+		if(Template._hoverStyle && this.state.hover){
+			additional.push(Template._hoverStyle);
+		}
+		if(Template._focusStyle && this.state.focus){
+			additional.push(Template._focusStyle);
+		}
+		if(additional.length){
+			return Object.assign(style,...additional);
+		}
+		return style;
+
 	}
 ,	buildClassName(givenProps){
-		const def = this.constructor.className;
+		const Template = this.constructor;
+		const def = Template.className;
 		const given = givenProps.className;
 		if(def && def.length && given && given.length){
 			const isArrayDef = Array.isArray(def);
@@ -66,29 +82,56 @@ export const methods = {
 		if(given && given.length){return given;}
 		if(def && def.length){return def;}
 	}
-,	buildLocals(props){
-		return props;
+,	buildEventsHandlers(givenProps){
+		const bindables = this.constructor.bindables;
+		if(!bindables || !bindables.length){return;}
+		const that = this;
+		const eventsHandlers = {};
+		bindables.forEach(function(name){
+			eventsHandlers[name] = that[name];
+		});
+		return eventsHandlers;
+	}
+,	processProps(mergedProps){
+		return mergedProps;
+	}
+,	buildLocals(generatedLocals){
+		return generatedLocals;
+	}
+,	computeClasses(locals){
+		if(locals.props.className){
+			locals.props.className = Array.isArray(locals.props.className) ? 
+				cx(...locals.props.className) : 
+				cx(locals.props.className)
+		}
+		return locals;
+	}
+,	mergeProps(givenProps,eventsHandlers,className,style){
+		const defaultProps = this.constructor.props;
+		return assign(
+			{
+				props:assign(
+					defaultProps.self
+				,	givenProps
+				,	eventsHandlers
+				,	className && {className}
+				,	style && {style}
+				)
+			}
+		,	defaultProps.children
+		)
 	}
 ,	getLocals(givenProps,includeCSS){
 		const className = this.buildClassName(givenProps);
 		const style = this.buildStyle(givenProps,includeCSS);
-		const defaultProps = this.constructor.props;
-		const props = this.buildLocals(
-			assign(
-				defaultProps.self
-			,	defaultProps.children
-			,	givenProps
-			,	className && {className}
-			,	style && {style}
+		const eventsHandlers = this.buildEventsHandlers(givenProps)
+		const mergedProps = this.mergeProps(givenProps,eventsHandlers,className,style);
+		const props = this.processProps(mergedProps)
+		const locals = this.buildLocals(
+			this.computeClasses(
+				this.compute(props,givenProps)
 			)
-		)
-		const locals = this.compute(
-			props
-		,	givenProps
-		)
-		if(locals.className){
-			locals.className = Array.isArray (locals.className) ? cx(...locals.className) : cx(locals.className)
-		}
+		);
 		return locals;
 	}
 ,	getTemplate(name){
@@ -102,7 +145,6 @@ export const methods = {
 		const template = this.getTemplate(name);
 		const defaultProps = template.props.self;
 		const props = mergeProps(defaultProps,givenProps);
-		const Temp = template;
 		if(typeof key!=='undefined'){
 			return React.createElement(template,{...props,key});
 		}
@@ -117,6 +159,6 @@ export const methods = {
 ,	render(){
 		const template = this.constructor.template;
 		this.locals = this.getLocals(this.props,this.props.includeCSS);
-		return template.call(this,this.locals);
+		return template.call(this,this.locals.props);
 	}
 }
