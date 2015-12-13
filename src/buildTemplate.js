@@ -6,7 +6,7 @@ const skip = /^(propTypes|name|className|style|css|state)$/
 const staticsKeys = Object.keys(statics);
 const methodsKeys = Object.keys(methods);
 
-export default function buildTemplate(render,conf,templates){
+export default function buildTemplate(render,conf,templates,...mixins){
 
 	const name = (conf && conf.name) || render.name;
 	const state = assign((conf && conf.state) || {});
@@ -104,6 +104,9 @@ export default function buildTemplate(render,conf,templates){
 	}
 
 	templates[name] = Template;
+	if(mixins){
+		mixins.forEach(mixin=>mixin(Template));
+	}
 	return Template;
 }
 

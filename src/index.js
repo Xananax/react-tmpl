@@ -7,8 +7,9 @@ export function prop(fn){
 }
 
 export function createTemplates(){
-	function boundBuildTemplate(render,conf){
-		return buildTemplate(render,conf,boundBuildTemplate);
+	function boundBuildTemplate(render,...mixins){
+		const conf = mixins.pop()
+		return buildTemplate(render,conf,boundBuildTemplate,...mixins);
 	}
 	boundBuildTemplate.prop = prop;
 	return boundBuildTemplate;

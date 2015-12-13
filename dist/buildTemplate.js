@@ -127,6 +127,16 @@ function buildTemplate(render, conf, templates) {
 	}
 
 	templates[name] = Template;
+
+	for (var _len = arguments.length, mixins = Array(_len > 3 ? _len - 3 : 0), _key = 3; _key < _len; _key++) {
+		mixins[_key - 3] = arguments[_key];
+	}
+
+	if (mixins) {
+		mixins.forEach(function (mixin) {
+			return mixin(Template);
+		});
+	}
 	return Template;
 }
 

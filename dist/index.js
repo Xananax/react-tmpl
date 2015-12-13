@@ -25,8 +25,13 @@ function prop(fn) {
 }
 
 function createTemplates() {
-	function boundBuildTemplate(render, conf) {
-		return (0, _buildTemplate2.default)(render, conf, boundBuildTemplate);
+	function boundBuildTemplate(render) {
+		for (var _len = arguments.length, mixins = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+			mixins[_key - 1] = arguments[_key];
+		}
+
+		var conf = mixins.pop();
+		return _buildTemplate2.default.apply(undefined, [render, conf, boundBuildTemplate].concat(mixins));
 	}
 	boundBuildTemplate.prop = prop;
 	return boundBuildTemplate;
