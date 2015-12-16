@@ -1,7 +1,13 @@
 import React,{Component} from 'react';
-import templates from './templates'
-
-const {Modal,KitchenSink} = templates;
+import {
+	Button
+,	ButtonRow
+,	CloseButton
+,	Contents
+,	Header
+,	Link
+,	Modal
+} from './templates'
 
 class App extends Component{
 
@@ -17,23 +23,7 @@ class App extends Component{
 				>
 					{this.state.open?'close':'open'}
 			</button>
-			<KitchenSink>sdfsdfsf</KitchenSink>
-			<Modal
-				onClose={()=>this.setState({open:false})}
-				title="I am a modal box"
-				isOpen={this.state.open}
-				includeCSS={true}
-				contents={[
-					'a piece of content'
-				,	<p>another piece of content</p>
-				]}
-				actions={[
-					{text:'inc',action:()=>this.setState({inc:this.state.inc+1})}
-				,	{text:'dec',action:()=>this.setState({inc:this.state.inc-1})}
-				]}
-				>
-				<div>{this.state.inc}</div>
-			</Modal>
+			<Modal title='hehe'>hello world</Modal>
 		</div>)
 	}
 }

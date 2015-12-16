@@ -8,8 +8,8 @@
     "clean": "rm -rf ./dist/*",
     "es5": "node ./node_modules/.bin/babel ./src -d ./dist",
     "compile": "npm run clean && npm run es5",
-    "commit":"rm -rf npm-debug.log && npm run compile && git add -A -n && echo \"press a key to continue\" && read && vim package.json && git add -A && git commit",
-    "push":"npm run commit && git push && npm publish",
+    "commit": "rm -rf npm-debug.log && npm run compile && git add -A -n && echo \"press a key to continue\" && read && vim package.json && git add -A && git commit",
+    "push": "npm run commit && git push && npm publish",
     "start": "webpack-dev-server --hot --inline --config webpack/server.js"
   },
   "jest": {
@@ -23,7 +23,9 @@
   },
   "dependencies": {
     "classnames": "^2.2.0",
-    "jobj": "^0.1.0"
+    "jobj": "^0.1.0",
+    "ramda": "git+https://git@github.com/ramda/ramda.git",
+    "uvdom": "^0.1.3"
   },
   "devDependencies": {
     "babel-cli": "^6.2.0",
